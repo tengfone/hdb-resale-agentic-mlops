@@ -1,0 +1,45 @@
+{
+  "description": "Drift detected in town and floor_area_sqm — MANUAL_REVIEW.",
+  "candidate_metrics": {"rmse": 155000.0, "mae": 125000.0},
+  "champion_info": {
+    "version": "2",
+    "run_id": "ghi789",
+    "metrics": {"rmse": 150000.0, "mae": 120000.0}
+  },
+  "comparison": {
+    "has_champion": true,
+    "candidate_metrics": {"rmse": 155000.0, "mae": 125000.0},
+    "champion_metrics": {"rmse": 150000.0, "mae": 120000.0},
+    "metric_deltas": {
+      "rmse_delta": 5000.0,
+      "rmse_delta_pct": 0.0333,
+      "mae_delta": 5000.0,
+      "mae_delta_pct": 0.0417
+    },
+    "segment_deltas": []
+  },
+  "drift_report": {
+    "overall_drift_detected": true,
+    "column_results": [
+      {"column": "town", "drift_type": "psi", "statistic": 0.35, "threshold": 0.2, "p_value": null, "is_drifted": true},
+      {"column": "flat_type", "drift_type": "psi", "statistic": 0.08, "threshold": 0.2, "p_value": null, "is_drifted": false},
+      {"column": "floor_area_sqm", "drift_type": "ks", "statistic": 0.12, "threshold": 0.05, "p_value": 0.001, "is_drifted": true}
+    ]
+  },
+  "policy_verdict": {
+    "decision": "MANUAL_REVIEW",
+    "reasons": [
+      "Data drift detected in: town, floor_area_sqm"
+    ],
+    "checks_passed": ["absolute_rmse", "absolute_mae", "champion_rmse_regression", "segment_rmse_regression"],
+    "checks_failed": ["drift_check"]
+  },
+  "model_name": "hdb-resale-price-regressor",
+  "model_version": "5",
+  "expected": {
+    "minimum_tools_called": ["query_candidate_metrics", "get_policy_verdict", "check_drift_report"],
+    "report_must_contain": ["MANUAL_REVIEW", "drift", "town"],
+    "report_must_not_contain": [],
+    "report_sections": ["Summary", "Evidence", "Risk Flags", "Recommendation"]
+  }
+}

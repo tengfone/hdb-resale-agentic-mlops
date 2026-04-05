@@ -1,0 +1,40 @@
+{
+  "description": "Candidate exceeds absolute RMSE threshold — REJECT.",
+  "candidate_metrics": {"rmse": 250000.0, "mae": 160000.0},
+  "champion_info": {
+    "version": "2",
+    "run_id": "def456",
+    "metrics": {"rmse": 155000.0, "mae": 125000.0}
+  },
+  "comparison": {
+    "has_champion": true,
+    "candidate_metrics": {"rmse": 250000.0, "mae": 160000.0},
+    "champion_metrics": {"rmse": 155000.0, "mae": 125000.0},
+    "metric_deltas": {
+      "rmse_delta": 95000.0,
+      "rmse_delta_pct": 0.6129,
+      "mae_delta": 35000.0,
+      "mae_delta_pct": 0.28
+    },
+    "segment_deltas": []
+  },
+  "drift_report": null,
+  "policy_verdict": {
+    "decision": "REJECT",
+    "reasons": [
+      "Test RMSE 250,000 exceeds maximum threshold 200,000",
+      "Candidate RMSE is 61.3% worse than champion (threshold: 10%)"
+    ],
+    "checks_passed": ["absolute_mae"],
+    "checks_failed": ["absolute_rmse", "champion_rmse_regression"],
+    "checks_skipped": []
+  },
+  "model_name": "hdb-resale-price-regressor",
+  "model_version": "4",
+  "expected": {
+    "minimum_tools_called": ["query_candidate_metrics", "get_policy_verdict"],
+    "report_must_contain": ["250,000", "REJECT", "200,000"],
+    "report_must_not_contain": [],
+    "report_sections": ["Summary", "Evidence", "Risk Flags", "Recommendation"]
+  }
+}

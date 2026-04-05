@@ -1,0 +1,123 @@
+{
+    "description": "Town segment YISHUN regresses >20% — MANUAL_REVIEW due to segment regression.",
+    "candidate_metrics": {
+        "rmse": 155000.0,
+        "mae": 123000.0
+    },
+    "champion_info": {
+        "version": "3",
+        "run_id": "jkl012",
+        "metrics": {
+            "rmse": 150000.0,
+            "mae": 120000.0
+        }
+    },
+    "comparison": {
+        "has_champion": true,
+        "candidate_metrics": {
+            "rmse": 155000.0,
+            "mae": 123000.0
+        },
+        "champion_metrics": {
+            "rmse": 150000.0,
+            "mae": 120000.0
+        },
+        "metric_deltas": {
+            "rmse_delta": 5000.0,
+            "rmse_delta_pct": 0.0333,
+            "mae_delta": 3000.0,
+            "mae_delta_pct": 0.025
+        },
+        "segment_deltas": [
+            {
+                "segment_column": "town",
+                "segment_value": "ANG MO KIO",
+                "candidate_rmse": 145000.0,
+                "champion_rmse": 140000.0,
+                "rmse_delta": 5000.0,
+                "rmse_delta_pct": 0.0357
+            },
+            {
+                "segment_column": "town",
+                "segment_value": "YISHUN",
+                "candidate_rmse": 195000.0,
+                "champion_rmse": 150000.0,
+                "rmse_delta": 45000.0,
+                "rmse_delta_pct": 0.30
+            },
+            {
+                "segment_column": "town",
+                "segment_value": "BEDOK",
+                "candidate_rmse": 148000.0,
+                "champion_rmse": 145000.0,
+                "rmse_delta": 3000.0,
+                "rmse_delta_pct": 0.0207
+            },
+            {
+                "segment_column": "flat_type",
+                "segment_value": "4 ROOM",
+                "candidate_rmse": 150000.0,
+                "champion_rmse": 148000.0,
+                "rmse_delta": 2000.0,
+                "rmse_delta_pct": 0.0135
+            },
+            {
+                "segment_column": "flat_type",
+                "segment_value": "5 ROOM",
+                "candidate_rmse": 165000.0,
+                "champion_rmse": 160000.0,
+                "rmse_delta": 5000.0,
+                "rmse_delta_pct": 0.0313
+            }
+        ]
+    },
+    "drift_report": {
+        "overall_drift_detected": false,
+        "column_results": [
+            {
+                "column": "town",
+                "drift_type": "psi",
+                "statistic": 0.05,
+                "threshold": 0.2,
+                "p_value": null,
+                "is_drifted": false
+            }
+        ]
+    },
+    "policy_verdict": {
+        "decision": "MANUAL_REVIEW",
+        "reasons": [
+            "Segment RMSE regressions exceed 20%: town=YISHUN (+30.0%)"
+        ],
+        "checks_passed": [
+            "absolute_rmse",
+            "absolute_mae",
+            "champion_rmse_regression",
+            "drift_check"
+        ],
+        "checks_failed": [
+            "segment_rmse_regression"
+        ]
+    },
+    "model_name": "hdb-resale-price-regressor",
+    "model_version": "4",
+    "expected": {
+        "minimum_tools_called": [
+            "query_candidate_metrics",
+            "get_policy_verdict",
+            "compare_segment_performance"
+        ],
+        "report_must_contain": [
+            "MANUAL_REVIEW",
+            "YISHUN",
+            "Segment"
+        ],
+        "report_must_not_contain": [],
+        "report_sections": [
+            "Summary",
+            "Evidence",
+            "Risk Flags",
+            "Recommendation"
+        ]
+    }
+}

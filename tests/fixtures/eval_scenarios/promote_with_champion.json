@@ -1,0 +1,46 @@
+{
+  "description": "Candidate beats champion on all metrics — straightforward PROMOTE.",
+  "candidate_metrics": {"rmse": 145000.0, "mae": 115000.0},
+  "champion_info": {
+    "version": "2",
+    "run_id": "abc123",
+    "metrics": {"rmse": 155000.0, "mae": 125000.0}
+  },
+  "comparison": {
+    "has_champion": true,
+    "candidate_metrics": {"rmse": 145000.0, "mae": 115000.0},
+    "champion_metrics": {"rmse": 155000.0, "mae": 125000.0},
+    "metric_deltas": {
+      "rmse_delta": -10000.0,
+      "rmse_delta_pct": -0.0645,
+      "mae_delta": -10000.0,
+      "mae_delta_pct": -0.08
+    },
+    "segment_deltas": [
+      {"segment_column": "town", "segment_value": "ANG MO KIO", "candidate_rmse": 140000.0, "champion_rmse": 150000.0, "rmse_delta": -10000.0, "rmse_delta_pct": -0.0667},
+      {"segment_column": "town", "segment_value": "BEDOK", "candidate_rmse": 148000.0, "champion_rmse": 155000.0, "rmse_delta": -7000.0, "rmse_delta_pct": -0.0452},
+      {"segment_column": "flat_type", "segment_value": "4 ROOM", "candidate_rmse": 142000.0, "champion_rmse": 150000.0, "rmse_delta": -8000.0, "rmse_delta_pct": -0.0533}
+    ]
+  },
+  "drift_report": {
+    "overall_drift_detected": false,
+    "column_results": [
+      {"column": "town", "drift_type": "psi", "statistic": 0.04, "threshold": 0.2, "p_value": null, "is_drifted": false},
+      {"column": "floor_area_sqm", "drift_type": "ks", "statistic": 0.03, "threshold": 0.05, "p_value": 0.42, "is_drifted": false}
+    ]
+  },
+  "policy_verdict": {
+    "decision": "PROMOTE",
+    "reasons": [],
+    "checks_passed": ["absolute_rmse", "absolute_mae", "champion_rmse_regression", "segment_rmse_regression", "drift_check"],
+    "checks_failed": []
+  },
+  "model_name": "hdb-resale-price-regressor",
+  "model_version": "3",
+  "expected": {
+    "minimum_tools_called": ["query_candidate_metrics", "query_champion_metrics", "get_policy_verdict"],
+    "report_must_contain": ["145,000", "155,000", "PROMOTE"],
+    "report_must_not_contain": [],
+    "report_sections": ["Summary", "Evidence", "Recommendation"]
+  }
+}

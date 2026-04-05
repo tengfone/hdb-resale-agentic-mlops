@@ -1,0 +1,58 @@
+# OS / editor noise
+.DS_Store
+.idea/
+.vscode/
+
+# Local environment files
+.env
+.env.*
+!.env.example
+!.env.example.*
+
+# Python environments and caches
+.venv/
+venv/
+env/
+ENV/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.hypothesis/
+
+# Notebook artifacts
+.ipynb_checkpoints/
+.jupyter/
+hdb-resale-candidate-training-maestro.ipynb
+hdb-resale-candidate-training-maestro-pipeline.ipynb
+
+# Coverage / test output
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+pytestdebug.log
+
+# Build / packaging output
+build/
+dist/
+pip-wheel-metadata/
+*.egg-info/
+
+# Local MLflow state
+mlflow.db
+mlflow.db-*
+mlruns/
+
+# Project-generated outputs
+artifacts/
+runtime/
+data/cache/
+data/processed/
+
+# Misc
+zip-all.sh
+BLOG.md

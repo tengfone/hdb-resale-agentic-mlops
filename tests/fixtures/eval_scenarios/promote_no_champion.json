@@ -1,0 +1,27 @@
+{
+  "description": "First model — no champion exists, meets absolute thresholds, PROMOTE verdict.",
+  "candidate_metrics": {"rmse": 150000.0, "mae": 120000.0},
+  "champion_info": null,
+  "comparison": {
+    "has_champion": false,
+    "candidate_metrics": {"rmse": 150000.0, "mae": 120000.0},
+    "champion_metrics": null,
+    "metric_deltas": {},
+    "segment_deltas": []
+  },
+  "drift_report": null,
+  "policy_verdict": {
+    "decision": "PROMOTE",
+    "reasons": ["No existing champion — only absolute thresholds applied"],
+    "checks_passed": ["absolute_rmse", "absolute_mae", "champion_comparison_skipped", "drift_check_skipped"],
+    "checks_failed": []
+  },
+  "model_name": "hdb-resale-price-regressor",
+  "model_version": "1",
+  "expected": {
+    "minimum_tools_called": ["query_candidate_metrics", "get_policy_verdict"],
+    "report_must_contain": ["150,000", "120,000", "PROMOTE"],
+    "report_must_not_contain": ["champion"],
+    "report_sections": ["Summary", "Evidence", "Recommendation"]
+  }
+}
