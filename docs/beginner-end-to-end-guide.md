@@ -753,8 +753,8 @@ Suppose the candidate model improves overall RMSE slightly.
 
 That sounds good, but what if:
 
-- it gets much worse in Yishun
-- or it performs badly for 3-room flats
+- the candidate's `town=Yishun` segment RMSE is much worse than the current champion's
+- or the candidate's `flat_type=3 ROOM` segment RMSE is much worse than the current champion's
 
 That would matter in the real world.
 
@@ -898,6 +898,12 @@ Drift is not proof that the model is bad.
 
 It is a signal that the environment may be changing.
 
+It is also only one kind of signal.
+
+If PSI and KS stay below threshold, that does not prove there is no concept drift and it does not guarantee every segment still performs well.
+
+That is why this repo checks both drift signals and candidate-vs-champion segment RMSE deltas.
+
 #### Why drift does not automatically reject
 
 This repo makes a subtle and good design choice:
@@ -930,7 +936,7 @@ This file answers the question:
 - reject if test RMSE is above the absolute maximum
 - reject if test MAE is above the absolute maximum
 - reject if overall RMSE regresses too much vs champion
-- send to manual review if segment regressions exceed the allowed percentage
+- send to manual review if any segment RMSE regression vs champion exceeds the allowed percentage
 - send to manual review if drift is detected and no harder reject condition already failed
 - promote only when all required checks pass
 
@@ -1255,7 +1261,7 @@ Responsible for:
 
 - interpretation
 - summarization
-- evidence gathering
+- supplemental investigation and context gathering after the deterministic checks
 - readable explanations
 
 #### Human layer

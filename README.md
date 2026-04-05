@@ -79,7 +79,7 @@ flowchart TD
     style ED fill:#fce4ec,stroke:#E91E63
 ```
 
-**Why three layers?** The policy engine handles routing deterministically. The explainer step is intentionally non-deterministic because the ReAct agent chooses which tools to call and how to synthesize the evidence. **Obvious rejects** are auto-rejected after the report is generated, while promote and manual-review cases pause for human approval. The agent provides depth as it investigates segment regressions, checks for drift, and researches market context so the human reviewer has a complete picture.
+**Why three layers?** The policy engine handles routing deterministically. The explainer step is intentionally non-deterministic because the ReAct agent chooses which tools to call and how to synthesize the evidence. **Obvious rejects** are auto-rejected after the report is generated, while promote and manual-review cases pause for human approval. The agent adds narrative and supporting context after the deterministic layer has already evaluated candidate-vs-champion performance, segmented regressions, and PSI/KS drift signals.
 
 ## How It Works
 
@@ -106,11 +106,13 @@ The same training logic now supports one public notebook and two internal enterp
 
 The public repo ships only the local / Colab notebook. Internal users who need the enterprise notebook variants should refer to the MAESTRO internal docs for the notebook entrypoints and platform-specific setup. All flows import from the same `src/hdb_resale_mlops/` package, so the training and review logic is still shared.
 
-### 3. Evaluation — Segment Metrics, Not Just Overall Accuracy
+### 3. Evaluation — Segmented Metrics, Not Just Overall Accuracy
 
-Overall RMSE (Root Mean Squared Error) tells you the model is good on average. But HDB prices varies tremendously, like an executive flat in the Central region (Kallang) behaves nothing like a 3-room flat in Yishun. A model that improves overall accuracy by harming specific segments is a regression is not acceptable.
+Overall RMSE (Root Mean Squared Error) tells you how the model performs on average. But HDB prices vary tremendously, an executive flat in Kallang behaves nothing like a 3-room flat in Yishun. A candidate that improves overall RMSE while posting a much worse segmented RMSE than the current champion for a town or flat type is still a regression for that subgroup.
 
-The evaluation layer computes RMSE and MAE (Mean Absolute Error) **per town** and **per flat type**. These segment metrics flow all the way through to the policy engine, so a segment regression in any group triggers a manual review.
+The evaluation layer computes RMSE and MAE (Mean Absolute Error) **per town** and **per flat type**. These segmented metrics flow all the way through to the policy engine, so a segmented regression in any group triggers a manual review.
+
+> **Why RMSE?** RMSE is simple and widely understood, which makes it a reasonable default for a demo-scope project. In practice, MAPE (percentage error) or RMSLE (log-scale error) can be better choices for housing price data as MAPE is more intuitive when price ranges are wide, and RMSLE dampens the outsized influence of very expensive outliers. The policy engine and segmented checks are metric-agnostic in structure, so adopting a different primary metric would not change the workflow design.
 
 ### 4. Promotion — Policy Engine + Agent + Human
 
@@ -123,9 +125,11 @@ The three-layer promotion workflow runs after evaluation:
 | Test RMSE exceeds absolute max | > $200,000 | `REJECT` |
 | Test MAE exceeds absolute max | > $170,000 | `REJECT` |
 | Overall RMSE regresses vs champion | > 10% worse | `REJECT` |
-| Segment RMSE regresses in any group | > 20% worse | `MANUAL_REVIEW` |
+| Segmented RMSE regresses vs champion in any group | > 20% worse | `MANUAL_REVIEW` |
 | Data drift detected (PSI or KS) | PSI > 0.2, KS p < 0.05 | `MANUAL_REVIEW` |
 | All checks pass, no champion exists | — | `PROMOTE` |
+
+Passing the PSI/KS drift checks only means the monitored features did not show a large distribution shift under those tests. It does not rule out concept drift or a segmented-specific performance regression, which is why segmented RMSE checks remain a separate policy input.
 
 **Layer 2 — ReAct explainer agent** receives the policy verdict and autonomously investigates using 7 tools:
 
@@ -336,9 +340,9 @@ pip install '.[all]'               # everything
 
 **Why policy is deterministic Python, not a config file.** Policy thresholds are code, versioned alongside the model training logic. When a threshold changes, the diff is a one-line Python change with a clear commit history. Config files hide decisions. Code makes them explicit and testable (see `tests/test_policy.py`).
 
-**Why per-segment metrics matter.** A model that improves overall RMSE by 5% but degrades predictions for 3-room flats by 30% is a regression for 3-room flat owners. Segment metrics by `town` and `flat_type` are logged as MLflow artifacts and flow through to the policy engine, so regressions in any subgroup trigger a manual review before promotion.
+**Why per-segment metrics matter.** A model that improves overall RMSE by 5% but has a 3-room-flat segment RMSE that is 30% worse than the current champion is still a regression for 3-room flat owners. Segmented metrics by `town` and `flat_type` are logged as MLflow artifacts and flow through to the policy engine, so regressions in any subgroup trigger a manual review before promotion.
 
-**Why drift blocks automatic promotion but does not force an immediate reject.** Distribution shifts between training and test data (e.g., post-COVID market resets, new BTO launches) are flagged via PSI (categorical) and KS tests (numeric). With the current default policy (`drift_blocks_promotion=True`), detected drift stops the workflow from auto-promoting and routes the candidate to `MANUAL_REVIEW` unless some harder reject condition already failed. That keeps the gate conservative while still leaving room for an explicit human override when the drift is expected or benign.
+**Why drift blocks automatic promotion but does not force an immediate reject.** Distribution shifts between training and test data (e.g., post-COVID market resets, new BTO launches) are flagged via PSI (categorical) and KS tests (numeric). Those tests are only one view of risk: passing them does not prove there is no concept drift, and failing them does not by itself prove the candidate is unusable. With the current default policy (`drift_blocks_promotion=True`), detected drift stops the workflow from auto-promoting and routes the candidate to `MANUAL_REVIEW` unless some harder reject condition already failed. Segmented RMSE regressions are evaluated separately for exactly this reason, so the policy can catch subgroup failures even when PSI/KS stay below threshold.
 
 **Why notebooks are the execution path.** In a notebook-first MLOps workflow, the notebook is the reproducible record of an experiment. Every run is a top-to-bottom execution: data download, training, evaluation, promotion decision. This makes the workflow auditable and approachable for data scientists who are not DevOps engineers.
 
